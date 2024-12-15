@@ -25,7 +25,7 @@ function Hero() {
       </div>
     </div>
   </div>
-  <Image src={'/dashboard.jpg'}
+  <Image src={'/dashboard.png'}
   alt='dashboard'
   width={1000}
   height={700}
