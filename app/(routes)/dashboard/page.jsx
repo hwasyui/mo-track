@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState } from "react";
 import { UserButton, useUser } from "@clerk/nextjs";
 import CardInfo from "./_components/CardInfo";
 import { db } from "@/utils/db";
@@ -7,20 +7,37 @@ import { Budgets, Expenses } from "@/utils/db/schema";
 import { getTableColumns, sql, eq, desc } from "drizzle-orm";
 import BarChartDashboard from "./_components/BarChartDashboard";
 import BudgetItem from "./budgets/_components/BudgetItem";
-import { toast } from "sonner";
 import ExpensesListTable from "./expenses/_components/ExpensesListTable";
 
 function Dashboard() {
-  const { user } = useUser(); // Hook to get user info
+  const { user } = useUser();
   const [budgetList, setBudgetList] = useState([]);
   const [expensesList, setExpensesList] = useState([]);
+  const getBudgetInfo = async () => {
+    const result = await db.select({
+      ...getTableColumns(Budgets),
+      totalSpend: sql`sum(${Expenses.amount}::numeric)`.mapWith(Number),
+      totalItem: sql`count(${Expenses.id})`.mapWith(Number)
+    }).from(Budgets)
+      .leftJoin(Expenses, eq(Budgets.id, Expenses.budgetId))
+      .where(eq(Budgets.createdBy, user?.primaryEmailAddress?.emailAddress))
+      .where(eq(Budgets.id, params.id))
+      .groupBy(Budgets.id);
 
-  // Fetch budgets with expenses
-  const getBudgetList = useCallback(async () => {
+    setBudgetInfo(result[0]);
+    getExpensesList();
+  }
+
+  // Fetch budgets and expenses
+  const fetchData = async () => {
+    if (!user) {
+      console.warn("User not logged in or undefined");
+      return;
+    }
+
     try {
-      if (!user) return;
-
       console.log("Fetching budget list...");
+      // Fetch budgets with aggregated expense data
       const budgetResult = await db
         .select({
           ...getTableColumns(Budgets),
@@ -36,18 +53,16 @@ function Dashboard() {
       setBudgetList(budgetResult);
       console.log("Budget list fetched:", budgetResult);
 
-      await fetchAllExpenses(); // Fetch expenses after budget list
+      // Fetch all expenses
+      await fetchAllExpenses();
     } catch (error) {
       console.error("Error fetching budget list:", error);
-      toast.error("Failed to fetch budget list. Please try again.");
     }
-  }, [user]);
+  };
 
   // Fetch all expenses
-  const fetchAllExpenses = useCallback(async () => {
+  const fetchAllExpenses = async () => {
     try {
-      if (!user) return;
-
       console.log("Fetching all expenses...");
       const expenseResult = await db
         .select({
@@ -65,16 +80,13 @@ function Dashboard() {
       console.log("Expenses fetched:", expenseResult);
     } catch (error) {
       console.error("Error fetching expenses:", error);
-      toast.error("Failed to fetch expenses. Please try again.");
     }
-  }, [user]);
+  };
 
-  // Initial data fetch
+  // Use effect to fetch data when user changes
   useEffect(() => {
-    if (user) {
-      getBudgetList();
-    }
-  }, [user, getBudgetList]);
+    fetchData();
+  }, [user]);
 
   return (
     <div className="p-5">
@@ -91,7 +103,7 @@ function Dashboard() {
           <BarChartDashboard budgetList={budgetList} />
           <ExpensesListTable
             expensesList={expensesList}
-            refreshData={getBudgetList} // Correctly passing the refresh function
+            refreshData={() => getBudgetInfo()}
           />
         </div>
 
