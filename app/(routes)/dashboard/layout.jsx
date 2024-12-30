@@ -50,7 +50,7 @@ function DashboardLayout({children}) {
       </div>
       <div className="flex-1">
         <DashboardHeader isOpen={isOpen} setIsOpen={setIsOpen} />
-        <main className="p-4 md:p-6">
+        <main className="p-2 md:p-2">
           {children}
         </main>
       </div>
