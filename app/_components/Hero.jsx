@@ -35,7 +35,7 @@ function Hero() {
           <div className="mt-8 flex flex-wrap justify-center gap-4">
             <button
               onClick={handleGetStartedClick} // Handle button click
-              className="block w-full rounded bg-primary px-12 py-3 text-sm font-medium text-white shadow hover:bg-secondary focus:outline-none focus:ring active:bg-red-500 sm:w-auto"
+              className="block w-full rounded bg-primary px-12 py-3 text-sm font-medium text-white shadow hover:bg-secondary focus:outline-none focus:ring active:bg-secondary sm:w-auto"
             >
               Get Started
             </button>
