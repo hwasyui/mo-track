@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { UserButton, useUser } from "@clerk/nextjs";
 import CardInfo from "./_components/CardInfo";
 import { db } from "@/utils/db";
-import { Budgets, Expenses } from "@/utils/db/schema";
+import { Budgets, Expenses, Incomes } from "@/utils/db/schema";
 import { getTableColumns, sql, eq, desc } from "drizzle-orm";
 import BarChartDashboard from "./_components/BarChartDashboard";
 import BudgetItem from "./budgets/_components/BudgetItem";
@@ -13,6 +13,7 @@ function Dashboard() {
   const { user } = useUser();
   const [budgetList, setBudgetList] = useState([]);
   const [expensesList, setExpensesList] = useState([]);
+  const [incomeList, setIncomeList] = useState([]);
   const getBudgetInfo = async () => {
     const result = await db.select({
       ...getTableColumns(Budgets),
@@ -26,7 +27,26 @@ function Dashboard() {
 
     setBudgetInfo(result[0]);
     getExpensesList();
+    getIncomeList();
   }
+  const getIncomeList = async () => {
+    try {
+      const result = await db
+        .select({
+          id: Incomes.id,
+          name: Incomes.name,
+          amount: Incomes.amount,
+          icon: Incomes.icon
+        })
+        .from(Incomes)
+        .where(eq(Incomes.createdBy, user?.primaryEmailAddress?.emailAddress));
+  
+      setIncomeList(result);
+      console.log("Income list fetched:", result);
+    } catch (error) {
+      console.error("Error fetching income list:", error);
+    }
+  };
 
   // Fetch budgets and expenses
   const fetchData = async () => {
@@ -34,7 +54,7 @@ function Dashboard() {
       console.warn("User not logged in or undefined");
       return;
     }
-
+  
     try {
       console.log("Fetching budget list...");
       // Fetch budgets with aggregated expense data
@@ -49,12 +69,15 @@ function Dashboard() {
         .where(eq(Budgets.createdBy, user?.primaryEmailAddress?.emailAddress))
         .groupBy(Budgets.id)
         .orderBy(desc(Budgets.id));
-
+  
       setBudgetList(budgetResult);
       console.log("Budget list fetched:", budgetResult);
-
+  
       // Fetch all expenses
       await fetchAllExpenses();
+      
+      // Fetch income list
+      await getIncomeList();
     } catch (error) {
       console.error("Error fetching budget list:", error);
     }
@@ -94,7 +117,7 @@ function Dashboard() {
       <p className="text-gray-500">Here's what's happening with your money!</p>
 
       {/* Card Info Component */}
-      <CardInfo budgetList={budgetList} />
+      <CardInfo budgetList={budgetList} incomeList={incomeList}/>
 
       {/* Main Grid Layout */}
       <div className="grid grid-cols-1 md:grid-cols-3 mt-6 gap-5">

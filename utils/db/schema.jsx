@@ -16,7 +16,7 @@ export const Expenses = pgTable('expenses', {
   createdAt: varchar('createdAt').notNull()
 });
 
-export const Income = pgTable('income', {
+export const Incomes = pgTable('income', {
   id: serial('id').primaryKey(),
   name: varchar('name').notNull(),
   amount: varchar('amount').notNull(), 

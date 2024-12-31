@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 import CreateIncome from './CreateIncome'
 import { db } from '@/utils/db'
 import { desc, eq, getTableColumns } from 'drizzle-orm'
-import { Income } from '@/utils/db/schema'
+import { Incomes } from '@/utils/db/schema'
 import { useUser } from '@clerk/nextjs'
 import IncomeItem from './IncomeItem'
 
@@ -17,10 +17,10 @@ function IncomeList() {
 
   const getIncomeList = async() => {
     const result = await db.select({
-      ...getTableColumns(Income),
-    }).from(Income)
-    .where(eq(Income.createdBy, user?.primaryEmailAddress?.emailAddress))
-    .orderBy(desc(Income.id));
+      ...getTableColumns(Incomes),
+    }).from(Incomes)
+    .where(eq(Incomes.createdBy, user?.primaryEmailAddress?.emailAddress))
+    .orderBy(desc(Incomes.id));
 
     setIncomeList(result);
   }

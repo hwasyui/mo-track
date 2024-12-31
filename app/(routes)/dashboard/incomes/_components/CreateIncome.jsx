@@ -14,7 +14,7 @@ import {
 import EmojiPicker from "emoji-picker-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Income } from "@/utils/db/schema";
+import { Incomes } from "@/utils/db/schema";
 import { useUser } from "@clerk/nextjs";
 import { toast } from "sonner";
 import { db } from "@/utils/db";
@@ -39,14 +39,14 @@ function CreateIncome({ refreshData }) {
   const onCreateIncome = async () => {
     const rawAmount = parseInt(amount.replace(/,/g, ""), 10);
     const result = await db
-      .insert(Income)
+      .insert(Incomes)
       .values({
         name: name,
         amount: rawAmount,
         createdBy: user?.primaryEmailAddress?.emailAddress,
         icon: emojiIcon,
       })
-      .returning({ insertedId: Income.id });
+      .returning({ insertedId: Incomes.id });
 
     if (result) {
       refreshData();

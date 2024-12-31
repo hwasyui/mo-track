@@ -1,11 +1,13 @@
-import { PiggyBank, ReceiptText, Wallet, DollarSign, WalletCards } from 'lucide-react'
-import React, { useEffect, useState } from 'react'
+import getFinancialAdvice from '@/utils/getFinancialAdvice';
+import { PiggyBank, ReceiptText, Wallet, DollarSign, WalletCards, Sparkles, Star, Brain, Blend, Bot } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
 
 function CardInfo({ budgetList, incomeList }) {
     const [totalBudget, setTotalBudget] = useState(0);
     const [totalSpend, setTotalSpend] = useState(0);
     const [numBudgets, setNumBudgets] = useState(0);
     const [totalIncome, setTotalIncome] = useState(0);
+    const [financialAdvice, setFinancialAdvice] = useState("Loading financial advice..."); 
 
     useEffect(() => {
         if (budgetList || incomeList) {
@@ -13,7 +15,23 @@ function CardInfo({ budgetList, incomeList }) {
         }
     }, [budgetList, incomeList]);
 
-    const CalculateCardInfo = async () => {
+    useEffect(() => {
+        if (totalBudget > 0 || totalIncome > 0 || totalSpend > 0) {
+          const fetchFinancialAdvice = async () => {
+            const advice = await getFinancialAdvice(
+              budgetList,  // Pass full budget list
+              totalBudget,
+              totalIncome,
+              totalSpend
+            );
+            setFinancialAdvice(advice);
+          };
+      
+          fetchFinancialAdvice();
+        }
+      }, [budgetList, totalBudget, totalIncome, totalSpend]);
+
+    const CalculateCardInfo = () => {
         console.log("Budget List:", budgetList);
         console.log("Income List:", incomeList);
         
@@ -29,7 +47,7 @@ function CardInfo({ budgetList, incomeList }) {
         });
 
         // Calculate income total
-        const incomes = Array.isArray(incomeList) ? incomeList : incomeList?.array || [];
+        const incomes = Array.isArray(incomeList) ? incomeList : [];
         incomes.forEach(element => {
             totalIncome_ += Number(element.amount || 0);
         });
@@ -45,34 +63,54 @@ function CardInfo({ budgetList, incomeList }) {
     return (
         <div>
             {budgetList?.length > 0 ?
-                <div className='mt-5 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3'>
-                    <div className='p-7 border rounded-lg flex items-center justify-between'>
-                        <div>
-                            <h2 className='text-sm'>Total Income</h2>
-                            <h2 className='font-bold text-2xl'>IDR. {totalIncome.toLocaleString()}</h2>
+                <div>
+                    <div className="p-7 border mt-4 -mb-1 rounded-2xl flex items-center justify-between">
+                        <div className="">
+                            <div className="flex mb-5 flex-row space-x-1 items-center justify-between">
+                                <h2 className="font-bold text-2xl">MoTrack! AI</h2>
+                                <Bot
+                                    className="rounded-full text-white w-10 h-10 p-2
+                                    bg-gradient-to-r
+                                    from-pink-700
+                                    via-rose-500
+                                    to-fuchsia-500
+                                    background-animate"
+                                />
+                            </div>
+                            <h2 className="text-md">
+                                {financialAdvice}
+                            </h2>
                         </div>
-                        <WalletCards className='bg-primary p-2 h-10 w-10 rounded-full text-white' />
                     </div>
-                    <div className='p-5 border rounded-lg flex items-center justify-between'>
-                        <div>
-                            <h2 className='text-sm'>Total Budget</h2>
-                            <h2 className='font-bold text-2xl'>IDR. {totalBudget.toLocaleString()}</h2>
+                    <div className='mt-5 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3'>
+                        <div className='p-7 border rounded-lg flex items-center justify-between'>
+                            <div>
+                                <h2 className='text-sm'>Total Income</h2>
+                                <h2 className='font-bold text-2xl'>IDR. {totalIncome.toLocaleString()}</h2>
+                            </div>
+                            <WalletCards className='bg-primary p-2 h-10 w-10 rounded-full text-white' />
                         </div>
-                        <PiggyBank className='bg-primary p-2 h-10 w-10 rounded-full text-white' />
-                    </div>
-                    <div className='p-7 border rounded-lg flex items-center justify-between'>
-                        <div>
-                            <h2 className='text-sm'>Total Spend</h2>
-                            <h2 className='font-bold text-2xl'>IDR. {totalSpend.toLocaleString()}</h2>
+                        <div className='p-5 border rounded-lg flex items-center justify-between'>
+                            <div>
+                                <h2 className='text-sm'>Total Budget</h2>
+                                <h2 className='font-bold text-2xl'>IDR. {totalBudget.toLocaleString()}</h2>
+                            </div>
+                            <PiggyBank className='bg-primary p-2 h-10 w-10 rounded-full text-white' />
                         </div>
-                        <ReceiptText className='bg-primary p-2 h-10 w-10 rounded-full text-white' />
-                    </div>
-                    <div className='p-7 border rounded-lg flex items-center justify-between'>
-                        <div>
-                            <h2 className='text-sm'>Number of Budgets</h2>
-                            <h2 className='font-bold text-2xl'>{numBudgets.toLocaleString()}</h2>
+                        <div className='p-7 border rounded-lg flex items-center justify-between'>
+                            <div>
+                                <h2 className='text-sm'>Total Spend</h2>
+                                <h2 className='font-bold text-2xl'>IDR. {totalSpend.toLocaleString()}</h2>
+                            </div>
+                            <ReceiptText className='bg-primary p-2 h-10 w-10 rounded-full text-white' />
                         </div>
-                        <Wallet className='bg-primary p-2 h-10 w-10 rounded-full text-white' />
+                        <div className='p-7 border rounded-lg flex items-center justify-between'>
+                            <div>
+                                <h2 className='text-sm'>Number of Budgets</h2>
+                                <h2 className='font-bold text-2xl'>{numBudgets.toLocaleString()}</h2>
+                            </div>
+                            <Wallet className='bg-primary p-2 h-10 w-10 rounded-full text-white' />
+                        </div>
                     </div>
                 </div>
                 :

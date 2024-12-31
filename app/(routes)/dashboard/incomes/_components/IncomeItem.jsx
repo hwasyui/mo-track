@@ -2,7 +2,7 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { Trash2, PenBox } from "lucide-react";
 import { db } from "@/utils/db";
-import { Income } from "@/utils/db/schema";
+import { Incomes } from "@/utils/db/schema";
 import { eq } from "drizzle-orm";
 import { toast } from "sonner";
 import EditIncome from "./EditIncome";
@@ -25,8 +25,8 @@ function IncomeItem({ income, refreshData }) {
 
   const onDeleteIncome = async () => {
     const result = await db
-      .delete(Income)
-      .where(eq(Income.id, income.id))
+      .delete(Incomes)
+      .where(eq(Incomes.id, income.id))
       .returning();
 
     if (result) {

@@ -17,7 +17,7 @@ import EmojiPicker from "emoji-picker-react";
 import { useUser } from "@clerk/nextjs";
 import { Input } from "@/components/ui/input";
 import { db } from "@/utils/db";
-import { Income } from "@/utils/db/schema";
+import { Incomes } from "@/utils/db/schema";
 import { eq } from "drizzle-orm";
 import { toast } from "sonner";
 
@@ -58,13 +58,13 @@ function EditIncome({ incomeInfo, refreshData }) {
       const numericAmount = parseFloat(parseNumber(amount));
 
       const result = await db
-        .update(Income)
+        .update(Incomes)
         .set({
           name,
           amount: numericAmount,
           icon: emojiIcon,
         })
-        .where(eq(Income.id, incomeInfo.id))
+        .where(eq(Incomes.id, incomeInfo.id))
         .returning();
 
       if (result) {
