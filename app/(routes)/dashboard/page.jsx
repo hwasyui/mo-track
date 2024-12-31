@@ -108,11 +108,13 @@ function Dashboard() {
         </div>
 
         {/* Latest Budgets */}
-        <div className="grid gap-5">
+        <div className="flex flex-col gap-5">
           <h2 className="font-bold text-lg">Latest Budgets</h2>
-          {budgetList.map((budget, index) => (
-            <BudgetItem budget={budget} key={index} />
-          ))}
+          <div className="grid gap-5 auto-rows-max content-start">
+            {budgetList.map((budget, index) => (
+              <BudgetItem budget={budget} key={index} />
+            ))}
+          </div>
         </div>
       </div>
     </div>
