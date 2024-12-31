@@ -1,7 +1,7 @@
 "use client";
 import React from 'react';
 import Image from 'next/image';
-import { LayoutGrid, PiggyBank, ReceiptText } from 'lucide-react';
+import { icons, LayoutGrid, PiggyBank, ReceiptText, WalletCards } from 'lucide-react';
 import { UserButton } from '@clerk/nextjs';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -16,12 +16,18 @@ function SideNav({ isOpen, setIsOpen }) {
         },
         {
             id: 2,
+            name: 'Incomes',
+            icon: WalletCards,
+            path: '/dashboard/incomes'
+        },
+        {
+            id: 3,
             name: 'Budgets',
             icon: PiggyBank,
             path: '/dashboard/budgets'
         },
         {
-            id: 3,
+            id: 4,
             name: 'Expenses',
             icon: ReceiptText,
             path: '/dashboard/expenses'
